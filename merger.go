@@ -76,12 +76,12 @@ func main() {
 	}
 
 	for _, sheetName := range wantSheets {
-		log.Print("Processing sheet: ", sheetName)
 		sheet := inFile.Sheet[sheetName]
 		matchedRows := 0
+
 		for i, inRow := range sheet.Rows {
 			if len(inRow.Cells) == 0 {
-				log.Print("Empty row: #", i)
+				log.Print(sheetName, ": empty row #", i)
 				continue
 			}
 
@@ -96,17 +96,21 @@ func main() {
 					var sheetCell *xlsx.Cell
 					outRow := outSheet.AddRow()
 
-					sheetCell = outRow.AddCell()
-					sheetCell.SetValue(sheetName)
-
 					for i := columnFrom; i <= columnTo; i++ {
 						sheetCell = outRow.AddCell()
-						sheetCell.SetValue(inRow.Cells[i].Value)
+
+						if s, err := strconv.ParseInt(inRow.Cells[i].Value, 10, 64); err == nil {
+							sheetCell.SetValue(fmt.Sprintf("%d", s))
+						} else if s, err := strconv.ParseFloat(inRow.Cells[i].Value, 64); err == nil {
+							sheetCell.SetValue(strconv.FormatFloat(s, 'f', -1, 64))
+						} else {
+							sheetCell.SetValue(inRow.Cells[i].Value)
+						}
 					}
 				}
 			}
 		}
-		log.Print("Matched rows: ", matchedRows)
+		log.Print(sheetName, ": ", matchedRows, " rows")
 	}
 
 	err = outFile.Save(arguments["<outfile>"].(string))
