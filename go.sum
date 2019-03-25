@@ -9,5 +9,7 @@ github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/tealeg/xlsx v1.0.3 h1:BXsDIQYBPq2HgbwUxrsVXIrnO0BDxmsdUfHSfvwfBuQ=
 github.com/tealeg/xlsx v1.0.3/go.mod h1:uxu5UY2ovkuRPWKQ8Q7JG0JbSivrISjdPzZQKeo74mA=
+github.com/thoas/go-funk v0.0.0-20181020164546-fbae87fb5b5c h1:3sFKuGerP3mGyXo7gDR1dGQ6GdIrI8s5KWmct0R5J6A=
+github.com/thoas/go-funk v0.0.0-20181020164546-fbae87fb5b5c/go.mod h1:mlR+dHGb+4YgXkf13rkQTuzrneeHANxOm6+ZnEV9HsA=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33q108Sa+fhmuc+sWQYwY=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

@@ -8,6 +8,7 @@ import (
 	"github.com/araddon/dateparse"
 	docopt "github.com/docopt/docopt-go"
 	xlsx "github.com/tealeg/xlsx"
+	funk "github.com/thoas/go-funk"
 )
 
 func main() {
@@ -24,7 +25,6 @@ func main() {
       --drifting    Drifting mine.`
 
 	arguments, _ := docopt.ParseDoc(usage)
-	fmt.Printf("%s\n", arguments)
 
 	reqDate, err := dateparse.ParseLocal(arguments["<date>"].(string))
 	if err != nil {
@@ -46,11 +46,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	sheets := arguments["<sheet>"].([]string)
-	for _, wantSheet := range sheets {
+	haveSheets := funk.Map(inFile.Sheets, func(sheet *xlsx.Sheet) string {
+		return sheet.Name
+	}).([]string)
+
+	log.Print("Infile sheets: ", funk.Map(haveSheets, func(name string) string {
+		return fmt.Sprintf("'%s'", name)
+	}).([]string))
+
+	wantSheets := arguments["<sheet>"].([]string)
+	for _, wantSheet := range wantSheets {
 		ok := false
-		for _, infileSheet := range inFile.Sheets {
-			if wantSheet == infileSheet.Name {
+		for _, infileSheet := range haveSheets {
+			if wantSheet == infileSheet {
 				ok = true
 			}
 		}
@@ -67,17 +75,24 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for _, sheetName := range sheets {
+	for _, sheetName := range wantSheets {
+		log.Print("Processing sheet: ", sheetName)
 		sheet := inFile.Sheet[sheetName]
-		for _, inRow := range sheet.Rows {
+		matchedRows := 0
+		for i, inRow := range sheet.Rows {
+			if len(inRow.Cells) == 0 {
+				log.Print("Empty row: #", i)
+				continue
+			}
+
 			inCell := inRow.Cells[0]
 
 			if inCell.Type() == xlsx.CellTypeNumeric {
 				v, _ := inCell.Float()
 				t := xlsx.TimeFromExcelTime(v, false)
-				// fmt.Printf("%s\n", t)
 
 				if t.Year() == reqDate.Year() && t.Month() == reqDate.Month() && t.Day() == reqDate.Day() {
+					matchedRows++
 					var sheetCell *xlsx.Cell
 					outRow := outSheet.AddRow()
 
@@ -91,6 +106,7 @@ func main() {
 				}
 			}
 		}
+		log.Print("Matched rows: ", matchedRows)
 	}
 
 	err = outFile.Save(arguments["<outfile>"].(string))
